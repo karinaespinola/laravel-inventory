@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
@@ -24,5 +25,12 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'The provided credentials do not match our records.'
         ], 401);
+    }
+
+    public function createToken(Request $request)
+    {
+        $token = $request->user()->createToken($request->token_name);
+
+        return ['token' => $token->plainTextToken];
     }
 }

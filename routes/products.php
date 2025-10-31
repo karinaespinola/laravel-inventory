@@ -10,4 +10,4 @@ Route::prefix('products')->group(function () {
     Route::put('/{product}', [ProductController::class, 'update']);
     Route::patch('/{product}', [ProductController::class, 'update']);
     Route::delete('/{product}', [ProductController::class, 'destroy']);
-});
+})->middleware('auth:sanctum');

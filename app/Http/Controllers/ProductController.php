@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Support\QueryFilters\ProductFilter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -11,31 +12,10 @@ class ProductController extends Controller
     /**
      * Display a listing of products.
      */
-    public function index(Request $request): JsonResponse
+    public function index(ProductFilter $filter): JsonResponse
     {
-        $query = Product::with(['category', 'images', 'warehouses']);
-
-        // Filter by category if provided
-        if ($request->has('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Filter by active status
-        if ($request->has('is_active')) {
-            $query->where('is_active', $request->boolean('is_active'));
-        }
-
-        // Search by name or slug
-        if ($request->has('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('slug', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $products = $query->paginate($request->get('per_page', 15));
-
-        return response()->json($products);
+        $perPage = (int) request('per_page', 15);
+        return response()->json($filter->apply($perPage));
     }
 
     /**
